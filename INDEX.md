@@ -94,3 +94,7 @@ for the curated "why/when" catalog.
 - [screenplay-libraries.md](./08-resources/screenplay-libraries.md)
 - [craft-books-bibliography.md](./08-resources/craft-books-bibliography.md)
 - [courses-and-youtube.md](./08-resources/courses-and-youtube.md)
+
+## app — Snowdraft (companion desktop app)
+- [app/README.md](./app/README.md) — what's built, what's stubbed, and how to get a macOS `.dmg`
+- [.github/workflows/build-macos.yml](./.github/workflows/build-macos.yml) — CI that builds the real `.dmg`

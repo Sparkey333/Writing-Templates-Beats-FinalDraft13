@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Snowdraft",
+  "version": "0.1.0",
+  "identifier": "com.writingcompendium.snowdraft",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Snowdraft — Story Planner & Editor",
+        "width": 1280,
+        "height": 840,
+        "minWidth": 900,
+        "minHeight": 600
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "publisher": "Writing Templates & Beats Compendium",
+    "copyright": "Apache-2.0",
+    "category": "Productivity",
+    "shortDescription": "Snowflake-method story planner and Fountain screenplay editor",
+    "longDescription": "Snowdraft plans novels and screenplays using the Snowflake Method, tracks unresolved story decisions in a dedicated focus tab, and edits Fountain-format screenplays alongside a Final Draft 13-inspired template library.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "dmg": {
+        "background": "dmg/background.png",
+        "windowSize": { "width": 660, "height": 400 },
+        "appPosition": { "x": 180, "y": 170 },
+        "applicationFolderPosition": { "x": 480, "y": 170 }
+      }
+    }
+  }
+}

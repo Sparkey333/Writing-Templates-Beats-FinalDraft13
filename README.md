@@ -32,6 +32,7 @@ patterns from.
 | [`06-genre-templates/`](./06-genre-templates/) | Original genre kits: the flagship **Toonami / Shōnen "Power‑Up Action Serial"** template, tournament & training arcs, heist, mystery, romance, horror, isekai, noir, space opera, redemption, frame‑story, and more. |
 | [`07-reference-analyses/`](./07-reference-analyses/) | Deep structural breakdowns: the **Kingkiller Chronicle** (Rothfuss), plus a **Top‑50 popular‑novel beat‑sheet index** with worked examples. |
 | [`08-resources/`](./08-resources/) | Every **link** worth having: **Brandon Sanderson's** free lectures/essays/podcast, legal screenplay libraries, a craft‑book bibliography, and courses/YouTube. |
+| [`app/`](./app/) | ⭐ **Snowdraft** — a desktop app (Tauri + React + Rust) that turns the FD13 × Snowflake template into a real planner, Fountain editor, and auto‑collected "unsure decisions" focus tab. See [`app/README.md`](./app/README.md) for what's built, what's stubbed, and how to get a macOS `.dmg`. |
 
 Full clickable table of contents: [`INDEX.md`](./INDEX.md).
 

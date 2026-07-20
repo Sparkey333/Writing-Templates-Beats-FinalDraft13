@@ -1,0 +1,72 @@
+name: Build macOS .dmg (Snowdraft)
+
+# This workflow exists because the app under app/ was built inside a Linux cloud container,
+# which cannot compile or open a macOS app — Tauri's macOS bundler only runs on macOS. This
+# runs on GitHub's hosted Apple-silicon macOS runners to produce a real, installable .dmg.
+# See app/README.md "Building a macOS .dmg" for the full explanation and a local-build option.
+
+on:
+  workflow_dispatch: {} # Actions tab -> "Run workflow" any time
+  push:
+    tags:
+      - "app-v*" # push a tag like app-v0.1.0 to also attach a GitHub Release
+  pull_request:
+    paths:
+      - "app/**"
+      - ".github/workflows/build-macos.yml"
+
+jobs:
+  build-macos-dmg:
+    # macos-14 is Apple silicon (arm64); Tauri also supports building a universal binary,
+    # left as a follow-up (see app/README.md Roadmap) to keep this workflow's first version simple.
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: app/src-tauri -> target
+
+      - name: Install frontend dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Build .dmg via tauri-action
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # To sign + notarize for distribution outside your own machine, add these repo
+          # secrets and uncomment (see https://tauri.app/distribute/sign/macos/):
+          # APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          # APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          # APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          # APPLE_ID: ${{ secrets.APPLE_ID }}
+          # APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          projectPath: app
+          # Only cut a GitHub Release when this ran from a tag push; PRs and manual runs
+          # still build and upload the .dmg as a workflow artifact (see the step below).
+          tagName: ${{ startsWith(github.ref, 'refs/tags/app-v') && github.ref_name || '' }}
+          releaseName: ${{ startsWith(github.ref, 'refs/tags/app-v') && format('Snowdraft {0}', github.ref_name) || '' }}
+          releaseDraft: true
+          includeUpdaterJson: false
+
+      - name: Upload .dmg as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: snowdraft-macos-dmg
+          path: app/src-tauri/target/release/bundle/dmg/*.dmg
+          if-no-files-found: error
