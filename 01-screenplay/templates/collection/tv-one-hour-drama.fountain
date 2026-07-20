@@ -1,0 +1,77 @@
+Title: _**YOUR SERIES TITLE**_
+Credit: "Episode Title"
+Author: Written by Your Name
+Draft date: 2026-07-20
+Contact:
+	you@example.com
+
+/*
+ONE-HOUR TV DRAMA TEMPLATE (single-camera) — Fountain format.
+Standard structure: Teaser/Cold Open + 4-5 Acts, ~45-65 pages total.
+Act breaks are commercial breaks in broadcast; streaming dramas often keep the act
+structure for pacing even without literal ad breaks.
+See ../formatting/screenplay-format-spec.md for TV-specific format notes.
+*/
+
+> COLD OPEN <
+
+INT./EXT. << LOCATION >> - << DAY/NIGHT >>
+
+<< A hook: a mystery, a cliffhanger, or a scene that sells this episode's premise
+before the titles roll. >>
+
+> END OF COLD OPEN <
+
+> MAIN TITLES <
+
+# ACT ONE
+= Establish this episode's A, B, and (if any) C stories. Plant the act-out hook.
+
+INT./EXT. << LOCATION >> - << DAY/NIGHT >>
+
+<< Scene. >>
+
+> END OF ACT ONE <
+
+# ACT TWO
+= Complications. The A story's plan meets its first real obstacle.
+
+INT./EXT. << LOCATION >> - << DAY/NIGHT >>
+
+<< Scene. >>
+
+> END OF ACT TWO <
+
+# ACT THREE
+= Midpoint reversal for this episode. Subplots start colliding.
+
+INT./EXT. << LOCATION >> - << DAY/NIGHT >>
+
+<< Scene. >>
+
+> END OF ACT THREE <
+
+# ACT FOUR
+= The episode's low point / escalation toward the act-out.
+
+INT./EXT. << LOCATION >> - << DAY/NIGHT >>
+
+<< Scene. >>
+
+> END OF ACT FOUR <
+
+# ACT FIVE
+= Climax and resolution of this episode's arcs; plant the hook for next episode.
+
+INT./EXT. << LOCATION >> - << DAY/NIGHT >>
+
+<< Scene. >>
+
+> END OF SHOW <
+
+/*
+SERIES-BIBLE NOTE: keep a running document of persistent world/character state across
+episodes — see ../../04-worldbuilding/ and ../../05-character/. Track each episode's
+A/B/C story against the season's serialized arc so standalone episodes still pay off
+the larger Save the Cat / Story Circle arc for the season.
+*/

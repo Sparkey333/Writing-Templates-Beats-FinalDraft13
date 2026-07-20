@@ -1,0 +1,81 @@
+Title: _**YOUR TITLE HERE**_
+Credit: Written by
+Author: Your Name
+Draft date: 2026-07-20
+Contact:
+	you@example.com
+
+/*
+FEATURE SCREENPLAY TEMPLATE — Fountain format.
+Opens in Final Draft, WriterDuet, Fade In, Highland, Slugline, and any Fountain-aware app.
+See ../formatting/fountain-syntax-cheatsheet.md for the syntax, and
+../formatting/screenplay-format-spec.md for the underlying industry format rules.
+
+Target length: 90-120 pages (1 page ~= 1 minute of screen time).
+This skeleton is pre-loaded with Save the Cat's 15 beats as section markers (##) and
+synopsis lines (=) so you can outline in this same file before you write a word of scene.
+Delete the section/synopsis scaffolding once you're drafting for real, or keep it —
+Fountain sections are non-printing, so they never show up in the exported script.
+*/
+
+# ACT ONE
+
+## 1. Opening Image (p.1)
+= The "before" snapshot. Establish tone and the hero's starting state.
+
+INT./EXT. << LOCATION >> - << DAY/NIGHT >>
+
+<< Action: introduce the world and the protagonist in their status quo. >>
+
+## 2. Theme Stated (p.5)
+= Someone (often not the hero) states what the story is really about.
+
+<< CHARACTER >>
+<< A line of dialogue that plants the theme. >>
+
+## 3. Set-Up (p.1-10)
+= Hero, flaws, the things that need fixing, the A-cast.
+
+## 4. Catalyst (p.12)
+= The inciting incident. The event that breaks the status quo.
+
+## 5. Debate (p.12-25)
+= The hero hesitates: should I do this?
+
+## 6. Break Into Two (p.25)
+= The hero chooses. Enters the new world.
+
+# ACT TWO
+
+## 7. B Story (p.30)
+= A secondary relationship that will carry the theme.
+
+## 8. Fun and Games (p.30-55)
+= The "promise of the premise" delivered.
+
+## 9. Midpoint (p.55)
+= A false victory or false defeat. Stakes raise.
+
+## 10. Bad Guys Close In (p.55-75)
+= External pressure mounts; internal doubts regroup.
+
+## 11. All Is Lost (p.75)
+= The lowest point. A "whiff of death."
+
+## 12. Dark Night of the Soul (p.75-85)
+= Hopelessness, before the answer is found.
+
+# ACT THREE
+
+## 13. Break Into Three (p.85)
+= The solution appears. A and B stories fuse.
+
+## 14. Finale (p.85-110)
+= Execute the plan. Prove the change. Build the new world.
+
+## 15. Final Image (p.110)
+= The "after" snapshot. Mirror-opposite of the Opening Image.
+
+FADE OUT.
+
+> THE END <

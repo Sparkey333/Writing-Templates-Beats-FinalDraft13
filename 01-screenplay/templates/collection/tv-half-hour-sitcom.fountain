@@ -1,0 +1,72 @@
+Title: _**YOUR SITCOM TITLE**_
+Credit: "Episode Title"
+Author: Written by Your Name
+Draft date: 2026-07-20
+Contact:
+	you@example.com
+
+/*
+HALF-HOUR MULTI-CAM SITCOM TEMPLATE — Fountain format.
+Multi-cam convention: ALL CAPS action lines, scene numbers, written for a live studio
+audience / table read. Target ~35-45 pages (multi-cam runs longer per page than single-cam
+due to format density). Single-camera sitcoms (e.g. mockumentary-style) can use the
+tv-one-hour-drama.fountain act structure instead, scaled down.
+See ../formatting/screenplay-format-spec.md for multi-cam vs single-cam notes.
+*/
+
+> COLD OPEN <
+
+INT. << STANDING SET (e.g. LIVING ROOM) >> - DAY
+
+(1) THE SCENE IS SET. THIS IS A MULTI-CAM SITCOM: ACTION LINES ARE TRADITIONALLY
+WRITTEN IN ALL CAPS. << CHARACTER >> ENTERS.
+
+                    << CHARACTER >>
+          << A joke-forward line that plants this
+          episode's premise. >>
+
+                    << CHARACTER 2 >>
+          << The response / turn. >>
+
+> END OF COLD OPEN <
+
+> MAIN TITLES <
+
+# ACT ONE
+
+INT. << STANDING SET >> - << DAY/NIGHT >>
+
+(2) << A-STORY SET UP. THE EPISODE'S COMIC PREMISE IS STATED AND THE PLAN IS HATCHED. >>
+
+                    << CHARACTER >>
+          << Dialogue. >>
+
+/*
+B-STORY: introduce the subplot in the same act, usually via a different pair of
+characters in the same or a secondary standing set.
+*/
+
+> END OF ACT ONE <
+
+# ACT TWO
+
+INT. << STANDING SET >> - << DAY/NIGHT >>
+
+(3) << THE PLAN COMPLICATES. THE A AND B STORIES ESCALATE IN PARALLEL, USUALLY
+CUTTING BETWEEN THEM SCENE TO SCENE. >>
+
+                    << CHARACTER >>
+          << Dialogue. >>
+
+> END OF ACT TWO <
+
+> TAG <
+
+INT. << STANDING SET >> - << DAY/NIGHT >>
+
+(4) << A SHORT CODA SCENE — THE FINAL JOKE, OFTEN CALLING BACK TO THE COLD OPEN. >>
+
+                    << CHARACTER >>
+          << Button line. >>
+
+> END OF SHOW <

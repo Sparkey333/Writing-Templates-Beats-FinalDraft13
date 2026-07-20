@@ -67,11 +67,13 @@ export default function DriveImport({ project, onChange }: Props) {
 
   return (
     <div className="drive-import">
-      <h2>Drive Import & Reorganize</h2>
+      <h2>Drive Import & Capture Inbox</h2>
       <p className="hint">
         Sort an existing folder of loose planning docs (chapters, act notes, character sheets)
         into this project's Snowflake steps — see{" "}
-        <code>final-draft-snowflake-master-template.md § Drive Import</code>.
+        <code>final-draft-snowflake-master-template.md § Drive Import</code>. Point it at a
+        <strong> Rabbit R1 capture folder</strong> and it triages voice-memo / note files the
+        same way — see <code>app/docs/rabbit-r1-capture-pipeline.md</code>.
       </p>
 
       <div className="drive-status-box">

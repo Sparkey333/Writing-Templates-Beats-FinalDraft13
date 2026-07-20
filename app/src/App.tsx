@@ -9,10 +9,12 @@ import SnowflakePlanner from "./components/SnowflakePlanner";
 import FountainEditor from "./components/FountainEditor";
 import FocusTab from "./components/FocusTab";
 import DriveImport from "./components/DriveImport";
+import TemplateGallery from "./components/TemplateGallery";
 
-type Tab = "planner" | "editor" | "focus" | "import";
+type Tab = "templates" | "planner" | "editor" | "focus" | "import";
 
 const TABS: { id: Tab; label: string }[] = [
+  { id: "templates", label: "Templates" },
   { id: "planner", label: "Snowflake Planner" },
   { id: "editor", label: "Editor" },
   { id: "focus", label: "Focus" },
@@ -52,6 +54,12 @@ export default function App() {
   function loadMatrixExample() {
     setProject(matrixSeedProject());
     setSavedPath(null);
+  }
+
+  function useTemplate(next: SnowflakeProject) {
+    setProject({ ...next, updatedAt: new Date().toISOString() });
+    setSavedPath(null);
+    setTab("planner");
   }
 
   return (
@@ -96,6 +104,7 @@ export default function App() {
       </nav>
 
       <main className="app-main">
+        {tab === "templates" && <TemplateGallery onUse={useTemplate} />}
         {tab === "planner" && <SnowflakePlanner project={project} onChange={setProject} />}
         {tab === "editor" && <FountainEditor project={project} onChange={setProject} />}
         {tab === "focus" && <FocusTab project={project} onChange={setProject} />}

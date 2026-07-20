@@ -81,6 +81,10 @@ fn classify_filename(name: &str) -> (String, &'static str) {
         (&["world", "map", "magic", "lore"], "World-building (see 04-worldbuilding/)"),
         (&["act ", "act-", "act1", "act 1", "act one"], "Act structure (Snowflake Step 2 disasters)"),
         (&["arc"], "Character/subplot arc (Snowflake Step 5)"),
+        // Rabbit R1 / voice-capture inbox items: raw notes to triage into a step.
+        // See ../docs/rabbit-r1-capture-pipeline.md.
+        (&["note", "idea", "memo", "capture", "voice", "thought", "journal", "r1"],
+         "⚑ Capture — triage into a Snowflake step"),
     ];
 
     for (keywords, step) in rules {
