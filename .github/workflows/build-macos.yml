@@ -57,10 +57,16 @@ jobs:
           # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           projectPath: app
-          # Only cut a GitHub Release when this ran from a tag push; PRs and manual runs
-          # still build and upload the .dmg as a workflow artifact (see the step below).
-          tagName: ${{ startsWith(github.ref, 'refs/tags/app-v') && github.ref_name || '' }}
-          releaseName: ${{ startsWith(github.ref, 'refs/tags/app-v') && format('Snowdraft {0}', github.ref_name) || '' }}
+          # Cut a draft GitHub Release (tag app-v0.1.0) on a tag push OR a manual dispatch.
+          # tauri-action creates the tag + release from the runner and attaches the .dmg, so
+          # no local `git push --tags` is needed. PRs still just upload the artifact below.
+          tagName: ${{ (startsWith(github.ref, 'refs/tags/app-v') || github.event_name == 'workflow_dispatch') && 'app-v0.1.0' || '' }}
+          releaseName: Snowdraft 0.1.0
+          releaseBody: |
+            Snowdraft 0.1.0 — the Snowflake-method story planner & Fountain screenplay editor.
+            Assets below: the macOS **.dmg** installer and a **source archive** (Snowdraft-source.zip),
+            plus GitHub's auto-generated source zip/tar for the tag.
+            The .dmg is unsigned — first launch: right-click the app → Open (once) to pass Gatekeeper.
           releaseDraft: true
           includeUpdaterJson: false
 
@@ -70,3 +76,11 @@ jobs:
           name: snowdraft-macos-dmg
           path: app/src-tauri/target/release/bundle/dmg/*.dmg
           if-no-files-found: error
+
+      - name: Attach zipped source archive to the release
+        if: startsWith(github.ref, 'refs/tags/app-v') || github.event_name == 'workflow_dispatch'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git archive --format=zip -o Snowdraft-source.zip HEAD
+          gh release upload app-v0.1.0 Snowdraft-source.zip --clobber
