@@ -206,6 +206,7 @@
 
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" data-tab="series" aria-selected="true">Series</button>
+    <button class="tab" role="tab" data-tab="codex" aria-selected="false">Codex</button>
     <button class="tab" role="tab" data-tab="planner" aria-selected="false">Planner</button>
     <button class="tab" role="tab" data-tab="editor" aria-selected="false">Editor</button>
     <button class="tab" role="tab" data-tab="art" aria-selected="false">Scene Art</button>
@@ -244,6 +245,23 @@
         <label class="lbl">Imported materials for the active book</label>
         <div id="matList"></div>
       </div></div>
+    </section>
+
+    <section id="t-codex" role="tabpanel" hidden>
+      <h2>World Codex — The Seven Creation Stones</h2>
+      <p class="sub">Canon, drawn directly from the manuscript text. Books 1–7 are named for these Stones.
+        Source: <code>shared/world-codex/magic-system/creation-stones.md</code> (marked CANON), corroborated by
+        <code>glossary.md</code>, <code>series-bible/series-arc.md</code>, and Book 1's own <code>step-04</code> synopsis.</p>
+      <div class="card"><div class="card-b" style="overflow-x:auto">
+        <table class="tbl"><thead><tr><th>Book</th><th>Stone</th><th>Domain</th><th>Wielder</th><th>Standing after Book 1</th></tr></thead>
+        <tbody id="stoneRows"></tbody></table>
+      </div></div>
+      <p class="sub" style="margin-top:16px">
+        <strong>The rule that makes them worth a war:</strong> a Stone grants the core of an aspect —
+        <em>“the crux of it, the emanating essence”</em> — bonded into the wielder's chest. Others can study the same
+        aspect and counter a wielder move for move, but understanding is borrowed; the Stone is owned.
+        <br><strong>Largest open gap:</strong> how a Stone transfers is never shown on the page.
+      </p>
     </section>
 
     <section id="t-planner" role="tabpanel" hidden>
@@ -338,21 +356,75 @@
 
   function blankProject(){return{logline:"",setup:"",d1:"",d2:"",d3:"",ending:"",characters:[],onePage:"",charSyn:"",fourPage:"",bibles:"",scenes:[],briefs:"",draft:"",materials:[],art:{}}}
   function scaffold(actNames){var p=blankProject();p.scenes=actNames.map(function(a){return{id:nid("s"),act:a[0],slug:a[1],sum:a[2],unsure:true}});return p}
+  // The seven Creation Stones — CANON, drawn directly from the manuscript text.
+  // Source: shared/world-codex/magic-system/creation-stones.md (marked CANON, lines 5-18),
+  // corroborated by world-codex/glossary.md ("The Stones"), series-bible/series-arc.md,
+  // and book-01 story-design/snowflake/step-04-one-page-synopsis.md.
+  var STONES=[
+    {stone:"Matter", domain:"Substance, solidity, the physical", standing:"The object of the whole plot", wielder:"Gwendolyn (d. Ch. II); hidden on Cephas Island"},
+    {stone:"Water",  domain:"Water and its behaviours", standing:"Contested", wielder:"Drowning, struck down"},
+    {stone:"Dominion",domain:"Command over others; the will", standing:"Dark — “the worst of their kind”", wielder:"The Morningstar's own"},
+    {stone:"Voids",  domain:"Absence, pressure differential, displacement", standing:"Bonded to Matter's line", wielder:"Gwendolyn wielded voids at full power"},
+    {stone:"Energy", domain:"Force, lightning, heat, motion", standing:"Dark", wielder:"Held among the dark host"},
+    {stone:"Light",  domain:"Light, sight, revelation", standing:"Light", wielder:"The celestial tier"},
+    {stone:"Phases", domain:"States of matter and transitions between them", standing:"OPEN — the wildcard", wielder:"Referenced, unassigned"}
+  ];
+
   function defaultState(){
-    return{seriesLogline:"",seriesArc:"",seriesWorld:"",activeBook:0,
-      byok:{provider:"openai",key:"",endpoint:""},
+    // Book 1 seeded from the real manuscript's own Snowflake work:
+    // books/book-01-stone-of-matter/story-design/snowflake/step-01 & step-02.
+    var som=blankProject();
+    som.logline="A boy on a hidden island must be tested for a power that destroys whoever wants it.";
+    som.setup="A thousand years after humanity burned the world, seven Creation Stones lie hidden on seven concealed islands, each guarded by an immortal who watches the darkness gather.";
+    som.d1="The Grand Wielder of Darkness is deliberately released and the guardian of Cephas Island is hunted down; she dies drawing her killers away from the Stone of Matter, leaving the island protected only by its own secrecy and its children untrained.";
+    som.d2="A decade later two brothers enter the Leviticum, and the darkness arrives as it did before — not as an army at the shore but as appetite inside the walls, turning a rival, a friend, and finally the boy's own hunger for power against everything he loves.";
+    som.d3="The Trials of Guardians begin, and what they test is not strength but wanting: to reach the Keys the brothers must go where the Trials separate them, and Ammon is offered the thing he has wanted since the mountain — on the one condition that costs him Mikael.";
+    som.ending="He refuses the shape of the offer without refusing the power, takes a path no Guardian has taken, and leaves the island changed and pursued — with six Stones still loose in a war that was never really about Proelum.";
+    som.characters=[
+      {id:nid("c"),name:"Ammon",role:"Protagonist",want:"To be tested — and to hold power",unsure:false},
+      {id:nid("c"),name:"Mikael",role:"Brother · the cost",want:"To become a Guardian beside Ammon",unsure:false},
+      {id:nid("c"),name:"Gwendolyn",role:"Guardian of Cephas (d. Ch. II)",want:"To keep the island hidden",unsure:false},
+      {id:nid("c"),name:"The Morningstar",role:"Antagonist · Grand Wielder of Darkness",want:"The Stones, and dominion over all",unsure:false}
+    ];
+    som.scenes=[
+      {id:nid("s"),act:"I",slug:"Part I — The Wind Caves",sum:"13 chapters · 52,666 words — Prologue, Preludes, brothers, Cephas, the Caves.",unsure:false},
+      {id:nid("s"),act:"II",slug:"Part II — Leviticum",sum:"9 chapters · 48,896 words — the Leviticum, Worlds, Gardens, the Emerald Whirlpool.",unsure:false},
+      {id:nid("s"),act:"III",slug:"Part III — Dark Windows",sum:"7 chapters · 40,786 words — the darkness inside the walls.",unsure:false},
+      {id:nid("s"),act:"IV",slug:"Part IV — Trials Of Guardians",sum:"10 chapters · 52,493 words — the Trials, the offer, A New Path, Epilogue.",unsure:false}
+    ];
+    som.materials=[{name:"manuscript/ (39 chapters, ~194,841 words)",dest:"s10",excerpt:"Full manuscript — Legend-of-Litiguh repo, branch claude/litiguh-manuscript-org-1nr8t7"}];
+
+    var sow=blankProject();
+    sow.logline="What Matter anchored, Water remakes — tide, depth, and loyalty as the second Stone rises.";
+    sow.scenes=[{id:nid("s"),act:"I",slug:"After the Tide",sum:"Aftermath of Matter; water omens; departure from safe shores.",unsure:true},
+      {id:nid("s"),act:"II",slug:"Depths",sum:"⚑ plan — the counter-current.",unsure:true},
+      {id:nid("s"),act:"III",slug:"⚑ Act III",sum:"⚑ plan — hands off toward Dominion.",unsure:true}];
+
+    var dom=blankProject();
+    dom.scenes=[{id:nid("s"),act:"I",slug:"⚑ Act I",sum:"Drafts exist in studio/content/manuscripts/sof/ — currently mislabeled “Stone of Fire”.",unsure:true},
+      {id:nid("s"),act:"II",slug:"⚑ Act II",sum:"⚑ plan — the Morningstar's own Stone; the Greater War opens.",unsure:true},
+      {id:nid("s"),act:"III",slug:"⚑ Act III",sum:"⚑ plan.",unsure:true}];
+
+    function stoneBook(n,name,role){var p=blankProject();
+      p.scenes=[{id:nid("s"),act:"I",slug:"⚑ unplanned",sum:"Stone of "+name+" — order among books 4–7 not yet fixed.",unsure:true}];return{title:"Book "+n+" — Stone of "+name,role:role,project:p}}
+
+    return{seriesLogline:"Seven Creation Stones, seven concealed islands, and a war that was never really about Proelum.",
+      seriesArc:"Seven Creation Stones. Book 1 resolves Matter; six remain loose. Three nested tiers widen one per book: the personal (Ammon & Mikael) → the planetary (Proelum's celestialization, the seven islands) → the Greater War the Stones belong to. (series-bible/series-arc.md)",
+      seriesWorld:"A Stone grants the core of an aspect — “the crux of it, the emanating essence” — bonded into the wielder's chest. Others can gain understanding of the same aspect and counter it move for move, but understanding is borrowed; the Stone is owned. Effects: crystallisation, longevity, amplification, guardianship of a place. How a Stone transfers is the largest OPEN gap. (world-codex/magic-system/creation-stones.md)",
+      activeBook:0, byok:{provider:"openai",key:"",endpoint:""},
       books:[
-        {title:"Book 1 — Stone of Matter",role:"Foundation · complete — system test 1",
-         project:scaffold([["1","⚑ Act I — import from manuscript","Drop Book 1 files in Capture to fill the real beats."],["2","⚑ Act II — import","Midpoint & complications."],["3","⚑ Act III — import","Climax & the Stone's price."]])},
-        {title:"Book 2 — Stone of Water",role:"Counterpoint · complete — system test 2",
-         project:scaffold([["1","⚑ Act I — import","Book 2 inverts Book 1's answers."],["2","⚑ Act II — import","The counter-current."],["3","⚑ Act III — import","Convergence toward Dominion."]])},
-        {title:"Book 3 — Dominion",role:"Triangulation · planned — system test 3",
-         project:scaffold([["1","⚑ Act I — plan","Where both Stones' threads meet."],["2","⚑ Act II — plan","The braided arcs collide."],["3","⚑ Act III — plan","Earned rise, inheritance, redemption."]])}
+        {title:"Book 1 — Stone of Matter",role:"COMPLETE · 39 chapters · ~194,841 words",project:som},
+        {title:"Book 2 — Stone of Water",role:"Planned · contested Stone",project:sow},
+        {title:"Book 3 — Stone of Dominion",role:"Drafts exist · the Morningstar's own",project:dom},
+        stoneBook(4,"Voids","Unordered · bonded to Matter's line"),
+        stoneBook(5,"Energy","Unordered · held among the dark host"),
+        stoneBook(6,"Light","Unordered · with the celestial tier"),
+        stoneBook(7,"Phases","Unordered · OPEN, the wildcard")
       ]};
   }
 
-  var LS="snowdraft.web.v2";
-  var state=load()||migrate()||defaultState();
+  var LS="snowdraft.web.v3"; // v3 = seven-Stone canon series (was v2's 3-book placeholder)
+  var state=load()||defaultState();
   function load(){try{var r=localStorage.getItem(LS);return r?JSON.parse(r):null}catch(e){return null}}
   function migrate(){try{var r=localStorage.getItem("snowdraft.web.v1");if(!r)return null;var old=JSON.parse(r);var st=defaultState();
     var p=st.books[0].project;["logline","setup","d1","d2","d3","ending","onePage","charSyn","fourPage","bibles","briefs","draft"].forEach(function(k){if(old[k])p[k]=old[k]});
@@ -594,10 +666,22 @@
   }
   $("#bookSel").addEventListener("change",function(){state.activeBook=+$("#bookSel").value;step=0;touch();switchTab(tab)});
   $("#title").addEventListener("input",function(){state.books[state.activeBook].title=$("#title").value;save();renderChrome()});
+  function renderCodex(){
+    var tb=$("#stoneRows");if(!tb)return;tb.innerHTML="";
+    STONES.forEach(function(s,i){
+      var r=h("tr");
+      var bk=h("td");bk.appendChild(h("strong",null,i<3?String(i+1):"4–7"));r.appendChild(bk);
+      var st=h("td");st.appendChild(h("strong",null,"Stone of "+s.stone));r.appendChild(st);
+      r.appendChild(h("td",null,s.domain));
+      r.appendChild(h("td",null,s.wielder));
+      var sd=h("td");sd.appendChild(h("span","chip "+(/OPEN/.test(s.standing)?"triage":/Dark/.test(s.standing)?"guess":"done"),s.standing));r.appendChild(sd);
+      tb.appendChild(r);
+    });
+  }
   function switchTab(name){tab=name;
     document.querySelectorAll(".tab").forEach(function(t){t.setAttribute("aria-selected",String(t.dataset.tab===name))});
-    ["series","planner","editor","art","focus","capture","templates"].forEach(function(n){$("#t-"+n).hidden=n!==name});
-    if(name==="series")renderSeries();if(name==="planner"){renderRing();renderRail();renderStep()}
+    ["series","codex","planner","editor","art","focus","capture","templates"].forEach(function(n){$("#t-"+n).hidden=n!==name});
+    if(name==="series")renderSeries();if(name==="codex")renderCodex();if(name==="planner"){renderRing();renderRail();renderStep()}
     if(name==="editor")bindEditor();if(name==="art")renderArt();if(name==="focus")renderFocus();
     if(name==="capture")renderCapture();if(name==="templates")renderTemplates()}
   document.querySelectorAll(".tab").forEach(function(t){t.addEventListener("click",function(){switchTab(t.dataset.tab)})});
