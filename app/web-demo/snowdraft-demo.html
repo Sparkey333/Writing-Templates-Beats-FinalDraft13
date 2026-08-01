@@ -1,0 +1,550 @@
+<title>Snowdraft — Stone of Matter ingestion demo</title>
+<style>
+  :root {
+    --ground: #12151d;
+    --panel: #1a1e28;
+    --panel-2: #212634;
+    --border: #2b3140;
+    --text: #e8ecf4;
+    --dim: #99a3ba;
+    --accent: #63d0f5;      /* brand ice — interactive only */
+    --accent-ink: #062330;
+    --green: #34d399;       /* semantic: sorted / success */
+    --green-bg: #0f2f26;
+    --amber: #f5b642;       /* semantic: needs triage */
+    --amber-bg: #322612;
+    --shadow: 0 1px 0 rgba(255,255,255,.02), 0 8px 24px rgba(0,0,0,.28);
+    --r: 12px;
+    --mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --ground: #f6f8fb; --panel: #ffffff; --panel-2: #f1f4f9; --border: #e2e6ef;
+      --text: #1a1f2b; --dim: #5c6579; --accent: #0a8fc0; --accent-ink: #ffffff;
+      --green: #0f9d6f; --green-bg: #e7f7f0; --amber: #b5791a; --amber-bg: #fbf1dd;
+      --shadow: 0 1px 2px rgba(16,21,29,.06), 0 10px 26px rgba(16,21,29,.08);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#12151d; --panel:#1a1e28; --panel-2:#212634; --border:#2b3140; --text:#e8ecf4;
+    --dim:#99a3ba; --accent:#63d0f5; --accent-ink:#062330; --green:#34d399; --green-bg:#0f2f26;
+    --amber:#f5b642; --amber-bg:#322612; --shadow:0 1px 0 rgba(255,255,255,.02),0 8px 24px rgba(0,0,0,.28);
+  }
+  :root[data-theme="light"] {
+    --ground:#f6f8fb; --panel:#ffffff; --panel-2:#f1f4f9; --border:#e2e6ef; --text:#1a1f2b;
+    --dim:#5c6579; --accent:#0a8fc0; --accent-ink:#ffffff; --green:#0f9d6f; --green-bg:#e7f7f0;
+    --amber:#b5791a; --amber-bg:#fbf1dd; --shadow:0 1px 2px rgba(16,21,29,.06),0 10px 26px rgba(16,21,29,.08);
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .shell {
+    font-family: var(--sans);
+    background: var(--ground);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+
+  /* Topbar */
+  .topbar {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: color-mix(in srgb, var(--ground) 86%, transparent);
+    backdrop-filter: blur(8px); z-index: 5;
+  }
+  .brand { font-weight: 700; letter-spacing:.2px; display:flex; align-items:center; gap:8px; }
+  .flake {
+    width: 22px; height: 22px; display: grid; place-items: center;
+    background: radial-gradient(circle at 50% 35%, #cdeeff 0%, var(--accent) 55%, transparent 72%),
+                linear-gradient(#12151d,#0a0c12);
+    border-radius: 7px; color: #eafaff; font-size: 13px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+  }
+  .brand .dim { color: var(--dim); font-weight: 500; }
+  .project { margin-left: auto; color: var(--dim); font-size: .92rem; }
+  .project strong { color: var(--text); }
+  .theme-btn {
+    border: 1px solid var(--border); background: var(--panel); color: var(--text);
+    width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: 15px;
+  }
+  .theme-btn:hover { border-color: var(--accent); }
+
+  /* Hero strip */
+  .hero { padding: 30px 0 8px; }
+  .eyebrow { font-size:.72rem; text-transform: uppercase; letter-spacing:.14em; color: var(--accent); font-weight: 700; }
+  .hero h1 { font-size: clamp(1.5rem, 2.6vw, 2.15rem); margin:.35em 0 .2em; letter-spacing:-.01em; text-wrap: balance; max-width: 20ch; }
+  .hero p { color: var(--dim); max-width: 62ch; margin: 0; }
+  .pipeline-line { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:16px; font-size:.85rem; }
+  .pipe-step { border:1px solid var(--border); background:var(--panel); border-radius:999px; padding:5px 11px; }
+  .pipe-step b { color: var(--accent); font-weight:700; }
+  .pipe-arrow { color: var(--dim); }
+
+  /* Tabs */
+  .tabs { display:flex; gap:4px; border-bottom:1px solid var(--border); margin-top:22px; }
+  .tab { appearance:none; border:0; background:transparent; color:var(--dim); font:inherit; font-weight:600;
+    padding:11px 14px; border-bottom:2px solid transparent; cursor:pointer; display:flex; align-items:center; gap:7px; }
+  .tab[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
+  .tab .count { font-variant-numeric: tabular-nums; background:var(--amber-bg); color:var(--amber);
+    border-radius:999px; padding:0 7px; font-size:.72rem; font-weight:800; }
+  .tab .count.zero { background:var(--green-bg); color:var(--green); }
+
+  main { padding: 22px 0 60px; }
+  h2 { font-size:1.15rem; margin:0 0 4px; letter-spacing:-.01em; }
+  .sub { color:var(--dim); font-size:.9rem; margin:0 0 18px; max-width:64ch; }
+
+  /* Capture layout */
+  .cap-grid { display:grid; grid-template-columns: 1.1fr .9fr; gap: 18px; align-items:start; }
+  @media (max-width: 860px){ .cap-grid { grid-template-columns: 1fr; } }
+  .card { background:var(--panel); border:1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow); }
+  .card-h { display:flex; align-items:center; gap:10px; padding:13px 15px; border-bottom:1px solid var(--border); }
+  .card-h h3 { margin:0; font-size:.95rem; }
+  .card-h .meta { margin-left:auto; color:var(--dim); font-size:.82rem; font-variant-numeric:tabular-nums; }
+  .card-b { padding: 14px 15px; }
+
+  /* Drop zone */
+  .drop {
+    border:1.5px dashed var(--border); border-radius: 10px; padding: 20px; text-align:center;
+    color: var(--dim); transition: border-color .15s, background .15s; cursor:pointer; display:block;
+  }
+  .drop:hover, .drop.drag { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); color: var(--text); }
+  .drop strong { color: var(--text); }
+  .drop input { display:none; }
+  .drop .big { font-size: 1.5rem; }
+  .row-btns { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+
+  .btn { font:inherit; font-weight:600; border-radius:8px; padding:7px 12px; cursor:pointer;
+    border:1px solid var(--border); background:var(--panel-2); color:var(--text); }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  .btn.small { padding:4px 9px; font-size:.82rem; }
+  .btn.ghost { background:transparent; }
+
+  /* Inbox list */
+  .queue { list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .qi { display:grid; grid-template-columns: 1fr auto; gap:8px 12px; align-items:center;
+    border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--panel-2);
+    animation: pop .18s ease; }
+  @keyframes pop { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce){ .qi { animation: none; } }
+  .qi .fname { font-family:var(--mono); font-size:.86rem; word-break:break-all; }
+  .qi .line2 { grid-column:1 / -1; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .chip { font-size:.72rem; font-weight:700; border-radius:999px; padding:2px 9px; letter-spacing:.02em; }
+  .chip.guess { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+  .chip.triage { background: var(--amber-bg); color: var(--amber); }
+  select.dest { font:inherit; font-size:.82rem; background:var(--panel); color:var(--text);
+    border:1px solid var(--border); border-radius:7px; padding:5px 8px; max-width: 240px; }
+  select.dest:focus, .btn:focus-visible, .tab:focus-visible, .drop:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .qi .act { display:flex; gap:6px; }
+
+  .empty { color:var(--dim); font-size:.9rem; text-align:center; padding:18px 0; }
+
+  /* Sorted pipeline */
+  .stat { display:flex; align-items:baseline; gap:8px; margin-bottom:12px; }
+  .stat .num { font-size:1.8rem; font-weight:800; font-variant-numeric:tabular-nums; color:var(--green); }
+  .stat .den { color:var(--dim); }
+  .bucket { border:1px solid var(--border); border-radius:10px; margin-bottom:8px; overflow:hidden; }
+  .bucket summary { cursor:pointer; padding:10px 12px; display:flex; align-items:center; gap:9px; font-weight:600; font-size:.9rem; }
+  .bucket summary::-webkit-details-marker { display:none; }
+  .dot { width:8px; height:8px; border-radius:50%; background:var(--green); flex:none; }
+  .bucket .n { margin-left:auto; color:var(--dim); font-variant-numeric:tabular-nums; }
+  .bucket ul { list-style:none; margin:0; padding:0 12px 10px 29px; display:flex; flex-direction:column; gap:4px; }
+  .bucket li { font-family:var(--mono); font-size:.8rem; color:var(--dim); }
+
+  /* Planner / forms */
+  .field { display:block; margin-bottom:14px; }
+  .field label { display:block; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--dim); margin-bottom:5px; }
+  .field input, .field textarea { width:100%; font:inherit; background:var(--panel); color:var(--text);
+    border:1px solid var(--border); border-radius:9px; padding:9px 11px; }
+  .field textarea { min-height:64px; resize:vertical; }
+  .field input:focus, .field textarea:focus { outline:none; border-color:var(--accent); }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:640px){ .two { grid-template-columns:1fr; } }
+
+  .focus-item { display:flex; gap:10px; align-items:center; border:1px solid var(--border); background:var(--panel);
+    border-radius:9px; padding:9px 12px; margin-bottom:7px; font-size:.9rem; }
+  .focus-item .fdot { width:8px; height:8px; border-radius:50%; background:var(--amber); flex:none; }
+  .focus-empty { display:flex; gap:10px; align-items:center; color:var(--green); font-weight:600; }
+
+  .tmpl-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px; }
+  .tmpl { border:1px solid var(--border); background:var(--panel); border-radius:11px; padding:13px; display:flex; flex-direction:column; gap:8px; }
+  .tmpl:hover { border-color:var(--accent); }
+  .tmpl .fmt { font-size:.66rem; text-transform:uppercase; letter-spacing:.05em; color:var(--accent); }
+  .tmpl h4 { margin:0; font-size:.95rem; }
+  .tmpl p { margin:0; color:var(--dim); font-size:.83rem; flex:1; }
+
+  footer { border-top:1px solid var(--border); color:var(--dim); font-size:.82rem; padding:16px 0 40px; }
+  footer a { color:var(--accent); }
+  .toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--green); color:#04231a; font-weight:700; padding:9px 16px; border-radius:10px;
+    opacity:0; transition:opacity .2s, transform .2s; pointer-events:none; font-size:.88rem; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  [hidden]{ display:none !important; }
+</style>
+
+<div class="shell">
+  <div class="topbar">
+    <div class="brand"><span class="flake">❄</span> Snowdraft <span class="dim">/ web demo</span></div>
+    <div class="project">Project: <strong>Stone of Matter</strong></div>
+    <button class="theme-btn" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
+  </div>
+
+  <div class="wrap">
+    <div class="hero">
+      <div class="eyebrow">Snowflake Method → Hero's Journey</div>
+      <h1>Catch every idea for <em>Stone of Matter</em> and file it where it grows.</h1>
+      <p>Drop notes, drafts, character sheets, or Rabbit R1 voice-captures below. Snowdraft reads each
+        filename and suggests where it belongs in your pipeline — a Snowflake step, world-building, an
+        act, or a character arc. You confirm; nothing moves on its own.</p>
+      <div class="pipeline-line">
+        <span class="pipe-step"><b>❄</b> one sentence</span><span class="pipe-arrow">→</span>
+        <span class="pipe-step">tributaries</span><span class="pipe-arrow">→</span>
+        <span class="pipe-step">roots</span><span class="pipe-arrow">→</span>
+        <span class="pipe-step"><b>🌱</b> character</span><span class="pipe-arrow">→</span>
+        <span class="pipe-step">Hero's Journey</span>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="capture" aria-selected="true">Capture &amp; Ingest <span class="count" id="c-inbox">0</span></button>
+      <button class="tab" role="tab" data-tab="planner" aria-selected="false">Snowflake Planner</button>
+      <button class="tab" role="tab" data-tab="focus" aria-selected="false">Focus <span class="count" id="c-focus">0</span></button>
+      <button class="tab" role="tab" data-tab="templates" aria-selected="false">Templates</button>
+    </div>
+
+    <main>
+      <!-- CAPTURE -->
+      <section id="tab-capture" role="tabpanel">
+        <h2>Capture &amp; Ingest</h2>
+        <p class="sub">The ingestion inbox. Same engine that reads a synced Google Drive folder or a Rabbit R1
+          capture folder — files are classified by name, you triage, and they flow into the Stone of Matter pipeline.</p>
+        <div class="cap-grid">
+          <div class="card">
+            <div class="card-h"><h3>Inbox — needs triage</h3><span class="meta" id="inboxMeta">0 files</span></div>
+            <div class="card-b">
+              <label class="drop" id="drop" tabindex="0" role="button" aria-label="Add files to the inbox">
+                <div class="big">📂</div>
+                <div><strong>Drop Stone of Matter files here</strong> or click to choose</div>
+                <div style="font-size:.82rem;margin-top:4px">.md · .txt · .fountain · .docx — classified by filename, contents never uploaded</div>
+                <input type="file" id="file" multiple />
+              </label>
+              <div class="row-btns">
+                <button class="btn small" id="addSamples">+ Add sample captures</button>
+                <button class="btn small primary" id="sortConfident">Sort all confident guesses</button>
+                <button class="btn small ghost" id="clearInbox">Clear</button>
+              </div>
+              <ul class="queue" id="queue"></ul>
+              <div class="empty" id="queueEmpty" hidden>Inbox empty — everything's filed. 🌱</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><h3>Stone of Matter pipeline</h3><span class="meta" id="sortedMeta">0 sorted</span></div>
+            <div class="card-b">
+              <div class="stat"><span class="num" id="sortedNum">0</span><span class="den" id="sortedDen">/ 0 captured</span></div>
+              <div id="buckets"></div>
+              <div class="empty" id="bucketsEmpty">Nothing filed yet. Triage items from the inbox →</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PLANNER -->
+      <section id="tab-planner" role="tabpanel" hidden>
+        <h2>Snowflake Planner</h2>
+        <p class="sub">Steps 1–2 for <strong>Stone of Matter</strong>. Blank fields become ⚑ items in the Focus tab —
+          and sorted captures show which steps you've fed material into.</p>
+        <div class="card"><div class="card-b">
+          <div class="field"><label>Step 1 — One-sentence summary</label>
+            <input id="p-logline" placeholder="A ___ must ___ before ___, but ___." /></div>
+          <div class="two">
+            <div class="field"><label>Setup</label><textarea id="p-setup"></textarea></div>
+            <div class="field"><label>Disaster 1 (~25%)</label><textarea id="p-d1"></textarea></div>
+            <div class="field"><label>Disaster 2 — Midpoint (~50%)</label><textarea id="p-d2"></textarea></div>
+            <div class="field"><label>Disaster 3 (~75%)</label><textarea id="p-d3"></textarea></div>
+          </div>
+          <div class="field"><label>Ending</label><textarea id="p-ending"></textarea></div>
+        </div></div>
+      </section>
+
+      <!-- FOCUS -->
+      <section id="tab-focus" role="tabpanel" hidden>
+        <h2>Focus — open decisions</h2>
+        <p class="sub">Auto-collected: blank planner fields plus inbox items still waiting to be triaged. Fill or file them and they clear on their own.</p>
+        <div id="focusList"></div>
+      </section>
+
+      <!-- TEMPLATES -->
+      <section id="tab-templates" role="tabpanel" hidden>
+        <h2>New from Template</h2>
+        <p class="sub">The start of the Final Draft 13 clone — each seeds a structured project. (Full 13-template gallery + Final Draft <code>.fountain</code> exports ship in the desktop app.)</p>
+        <div class="tmpl-grid" id="tmplGrid"></div>
+      </section>
+    </main>
+
+    <footer>
+      Web demo of <strong>Snowdraft</strong> — the desktop app (Tauri + React + Rust) adds native file save/open,
+      the real Google&nbsp;Drive / Rabbit&nbsp;R1 folder scanner, and the macOS <code>.dmg</code>.
+      Repo: <a href="https://github.com/Sparkey333/Writing-Templates-Beats-FinalDraft13" target="_blank" rel="noreferrer">Writing-Templates-Beats-FinalDraft13</a>.
+    </footer>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- Destinations (the pipeline slots) ----
+  var DESTS = [
+    { id: "s1",  label: "Step 1 — Logline" },
+    { id: "s2",  label: "Step 2 — One-paragraph" },
+    { id: "s3",  label: "Step 3 — Characters" },
+    { id: "s4",  label: "Step 4 — One-page synopsis" },
+    { id: "s5",  label: "Step 5 — Character synopses" },
+    { id: "s6",  label: "Step 6 — Four-page synopsis" },
+    { id: "s7",  label: "Step 7 — Character bibles" },
+    { id: "s8",  label: "Step 8 — Scene list" },
+    { id: "s9",  label: "Step 9 — Scene briefs" },
+    { id: "s10", label: "Step 10 — Draft" },
+    { id: "world", label: "World-building" },
+    { id: "act",   label: "Act structure" },
+    { id: "arc",   label: "Character / subplot arc" },
+    { id: "triage",label: "⚑ Capture — needs triage" }
+  ];
+  var LABEL = {}; DESTS.forEach(function (d) { LABEL[d.id] = d.label; });
+
+  // ---- Classifier: mirrors app/src-tauri/src/lib.rs classify_filename ----
+  var RULES = [
+    [["logline","one-sentence","one sentence","pitch"], "s1"],
+    [["paragraph-summary","paragraph summary","synopsis-short"], "s2"],
+    [["character-sheet","character sheet","char-summary","cast"], "s3"],
+    [["one-page","one page","synopsis"], "s4"],
+    [["pov","character-synopsis","character synopsis"], "s5"],
+    [["four-page","4-page","four page","long-synopsis"], "s6"],
+    [["bible","dossier","backstory"], "s7"],
+    [["scene-list","scene list","outline","beatsheet","beat-sheet","beat sheet"], "s8"],
+    [["scene-brief","scene brief","brief"], "s9"],
+    [["chapter","ch0","ch1","ch2","ch3","draft",".fountain"], "s10"],
+    [["world","map","magic","lore","matterstone","stone of matter"], "world"],
+    [["act ","act-","act1","act 1","act one","act two","act three"], "act"],
+    [["arc"], "arc"],
+    [["note","idea","memo","capture","voice","thought","journal","r1"], "triage"]
+  ];
+  function classify(name) {
+    var n = name.toLowerCase();
+    for (var i = 0; i < RULES.length; i++) {
+      var kws = RULES[i][0];
+      for (var k = 0; k < kws.length; k++) {
+        if (n.indexOf(kws[k]) !== -1) {
+          return { dest: RULES[i][1], confident: RULES[i][1] !== "triage" };
+        }
+      }
+    }
+    return { dest: "triage", confident: false };
+  }
+
+  // ---- State ----
+  var uid = 0;
+  var inbox = [];              // {id, name, dest, confident}
+  var sorted = [];             // {name, dest}
+  var totalCaptured = 0;
+
+  var SAMPLES = [
+    "stone-of-matter-logline.txt",
+    "one-paragraph-summary.md",
+    "protagonist-character-sheet.md",
+    "antagonist-arc.md",
+    "world-the-matterstone-magic.md",
+    "act-two-outline.md",
+    "chapter-01-draft.fountain",
+    "scene-brief-the-vault.txt",
+    "voice-memo-2026-07-19-idea.txt",
+    "r1-note-market-scene.txt",
+    "random-thought.txt"
+  ];
+
+  function addFiles(names) {
+    names.forEach(function (name) {
+      if (!name) return;
+      var c = classify(name);
+      inbox.push({ id: ++uid, name: name, dest: c.dest, confident: c.confident });
+      totalCaptured++;
+    });
+    render();
+  }
+
+  function sortItem(id) {
+    var idx = inbox.findIndex(function (it) { return it.id === id; });
+    if (idx < 0) return;
+    var it = inbox[idx];
+    sorted.push({ name: it.name, dest: it.dest });
+    inbox.splice(idx, 1);
+    toast("Filed → " + LABEL[it.dest]);
+    render();
+  }
+
+  function setDest(id, dest) {
+    var it = inbox.find(function (x) { return x.id === id; });
+    if (it) { it.dest = dest; it.confident = dest !== "triage"; render(); }
+  }
+
+  // ---- Render ----
+  var $ = function (s) { return document.querySelector(s); };
+  function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+
+  function render() {
+    // inbox
+    var q = $("#queue"); q.innerHTML = "";
+    inbox.forEach(function (it) {
+      var li = el("li", "qi");
+      var fname = el("div", "fname", it.name);
+      var act = el("div", "act");
+      var sortBtn = el("button", "btn small primary", "Sort →");
+      sortBtn.addEventListener("click", function () { sortItem(it.id); });
+      act.appendChild(sortBtn);
+      li.appendChild(fname); li.appendChild(act);
+
+      var line2 = el("div", "line2");
+      var chip = el("span", "chip " + (it.confident ? "guess" : "triage"), it.confident ? "suggested" : "needs triage");
+      line2.appendChild(chip);
+      var sel = el("select", "dest");
+      DESTS.forEach(function (d) {
+        var o = el("option", null, d.label); o.value = d.id; if (d.id === it.dest) o.selected = true; sel.appendChild(o);
+      });
+      sel.addEventListener("change", function () { setDest(it.id, sel.value); });
+      line2.appendChild(sel);
+      li.appendChild(line2);
+      q.appendChild(li);
+    });
+    $("#queueEmpty").hidden = inbox.length !== 0;
+    $("#inboxMeta").textContent = inbox.length + (inbox.length === 1 ? " file" : " files");
+    var cin = $("#c-inbox"); cin.textContent = inbox.length; cin.classList.toggle("zero", inbox.length === 0);
+
+    // sorted buckets
+    var buckets = {};
+    sorted.forEach(function (s) { (buckets[s.dest] = buckets[s.dest] || []).push(s.name); });
+    var wrap = $("#buckets"); wrap.innerHTML = "";
+    DESTS.forEach(function (d) {
+      var items = buckets[d.id]; if (!items) return;
+      var det = el("details", "bucket"); det.open = true;
+      var sum = el("summary");
+      sum.appendChild(el("span", "dot"));
+      sum.appendChild(el("span", null, d.label));
+      sum.appendChild(el("span", "n", String(items.length)));
+      det.appendChild(sum);
+      var ul = el("ul");
+      items.forEach(function (nm) { ul.appendChild(el("li", null, nm)); });
+      det.appendChild(ul); wrap.appendChild(det);
+    });
+    $("#bucketsEmpty").hidden = sorted.length !== 0;
+    $("#sortedNum").textContent = sorted.length;
+    $("#sortedDen").textContent = "/ " + totalCaptured + " captured";
+    $("#sortedMeta").textContent = sorted.length + " sorted";
+
+    renderFocus();
+  }
+
+  // ---- Focus (blank planner fields + untriaged inbox) ----
+  var PLAN = [
+    ["p-logline","Step 1 — one-sentence summary is blank"],
+    ["p-setup","Step 2 — Setup sentence is blank"],
+    ["p-d1","Step 2 — Disaster 1 is blank"],
+    ["p-d2","Step 2 — Disaster 2 (Midpoint) is blank"],
+    ["p-d3","Step 2 — Disaster 3 is blank"],
+    ["p-ending","Step 2 — Ending is blank"]
+  ];
+  function renderFocus() {
+    var list = $("#focusList"); list.innerHTML = "";
+    var items = [];
+    PLAN.forEach(function (p) { var v = $("#" + p[0]); if (v && !v.value.trim()) items.push(p[1]); });
+    var untriaged = inbox.filter(function (i) { return !i.confident; }).length;
+    if (untriaged) items.push(untriaged + " capture" + (untriaged>1?"s":"") + " in the inbox still need a destination");
+    if (!items.length) {
+      var ok = el("div", "focus-empty"); ok.appendChild(el("span", null, "✓")); ok.appendChild(el("span", null, "Nothing flagged — nice.")); list.appendChild(ok);
+    } else {
+      items.forEach(function (t) {
+        var d = el("div", "focus-item"); d.appendChild(el("span", "fdot")); d.appendChild(el("span", null, t)); list.appendChild(d);
+      });
+    }
+    var cf = $("#c-focus"); cf.textContent = items.length; cf.classList.toggle("zero", items.length === 0);
+  }
+
+  // ---- Templates ----
+  var TEMPLATES = [
+    ["Screenplay","Feature — Save the Cat","15 beats seeded as scenes."],
+    ["Any medium","Hero's Journey","The 12 mythic stages."],
+    ["Any medium","Story Circle","Harmon's 8-step circle."],
+    ["Genre","Toonami / Shōnen Power-Up","The DBZ escalation loop."],
+    ["Novel","Snowflake (blank)","Grow from one sentence."],
+    ["Genre","Fair-Play Mystery","Solvable clue structure."]
+  ];
+  (function () {
+    var g = $("#tmplGrid");
+    TEMPLATES.forEach(function (t) {
+      var c = el("div", "tmpl");
+      c.appendChild(el("div", "fmt", t[0]));
+      c.appendChild(el("h4", null, t[1]));
+      c.appendChild(el("p", null, t[2]));
+      var b = el("button", "btn small primary", "Use template");
+      b.addEventListener("click", function () { toast('Seeded "' + t[1] + '" into the planner'); switchTab("planner"); });
+      c.appendChild(b); g.appendChild(c);
+    });
+  })();
+
+  // ---- Tabs ----
+  function switchTab(name) {
+    document.querySelectorAll(".tab").forEach(function (t) { t.setAttribute("aria-selected", String(t.dataset.tab === name)); });
+    ["capture","planner","focus","templates"].forEach(function (n) { $("#tab-" + n).hidden = n !== name; });
+  }
+  document.querySelectorAll(".tab").forEach(function (t) {
+    t.addEventListener("click", function () { switchTab(t.dataset.tab); });
+  });
+
+  // ---- Drop zone ----
+  var drop = $("#drop"), fileInput = $("#file");
+  fileInput.addEventListener("change", function () {
+    addFiles(Array.prototype.map.call(fileInput.files, function (f) { return f.name; })); fileInput.value = "";
+  });
+  ["dragenter","dragover"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("drag"); }); });
+  ["dragleave","drop"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("drag"); }); });
+  drop.addEventListener("drop", function (e) {
+    var files = e.dataTransfer && e.dataTransfer.files;
+    if (files && files.length) addFiles(Array.prototype.map.call(files, function (f) { return f.name; }));
+  });
+  drop.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); } });
+
+  $("#addSamples").addEventListener("click", function () { addFiles(SAMPLES); });
+  $("#sortConfident").addEventListener("click", function () {
+    var ids = inbox.filter(function (i) { return i.confident; }).map(function (i) { return i.id; });
+    if (!ids.length) { toast("No confident guesses to sort"); return; }
+    ids.forEach(sortItem);
+  });
+  $("#clearInbox").addEventListener("click", function () { inbox = []; render(); });
+
+  // planner → focus live
+  PLAN.forEach(function (p) { var e = $("#" + p[0]); if (e) e.addEventListener("input", renderFocus); });
+
+  // ---- Theme toggle ----
+  $("#themeToggle").addEventListener("click", function () {
+    var cur = document.documentElement.getAttribute("data-theme");
+    var next = cur === "light" ? "dark" : cur === "dark" ? "light"
+      : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "dark");
+    document.documentElement.setAttribute("data-theme", next);
+  });
+
+  // ---- Toast ----
+  var toastTimer;
+  function toast(msg) {
+    var t = $("#toast"); t.textContent = msg; t.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove("show"); }, 1700);
+  }
+
+  // seed the demo so it's alive on open
+  addFiles(SAMPLES);
+})();
+</script>

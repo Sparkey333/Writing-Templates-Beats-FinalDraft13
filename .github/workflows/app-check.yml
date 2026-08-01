@@ -1,0 +1,51 @@
+name: App sanity check (Linux, fast)
+
+# Cheap, fast verification on every PR touching app/ — the same checks that were run
+# manually to confirm this app's code is real and correct (see app/README.md "What's
+# actually verified"). This runs on ordinary Linux runners, unlike build-macos.yml, so it's
+# a fast first signal before spending macOS runner minutes on a full .dmg build.
+
+on:
+  push:
+    paths:
+      - "app/**"
+      - ".github/workflows/app-check.yml"
+  pull_request:
+    paths:
+      - "app/**"
+      - ".github/workflows/app-check.yml"
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - working-directory: app
+        run: npm ci
+      - name: Type-check
+        working-directory: app
+        run: npx tsc --noEmit
+      - name: Production build
+        working-directory: app
+        run: npm run build
+
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: app/src-tauri -> target
+      - name: Install Tauri Linux prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev build-essential libssl-dev libxdo-dev pkg-config
+      - name: cargo check
+        working-directory: app/src-tauri
+        run: cargo check
